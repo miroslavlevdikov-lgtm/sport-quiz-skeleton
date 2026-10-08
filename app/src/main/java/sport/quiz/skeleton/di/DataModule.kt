@@ -19,7 +19,7 @@ val dataModule = module {
 
     single { get<PrefixDatabase>().highScoreDao() }
 
-    single { PrefixHighScoreRepository(highScoreDao = get()) }
+    single { PrefixHighScoreRepository(highScoreDao = get(), dispatchers = get()) }
 
     single { PrefixTopicRepository() }
 }

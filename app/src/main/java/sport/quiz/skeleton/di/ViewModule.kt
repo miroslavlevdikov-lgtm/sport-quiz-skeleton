@@ -15,13 +15,15 @@ val viewModule = module {
         PrefixGameViewModel(
             savedStateHandle = get(),
             topicRepository = get(),
-            highScoreRepository = get()
+            highScoreRepository = get(),
+            dispatchers = get()
         )
     }
 
     viewModel {
         PrefixHighScoreViewModel(
-            highScoreRepository = get()
+            highScoreRepository = get(),
+            dispatchers = get()
         )
     }
 }

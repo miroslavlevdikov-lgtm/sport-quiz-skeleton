@@ -14,6 +14,7 @@ import sport.quiz.skeleton.data.entity.PrefixHighScore
 import sport.quiz.skeleton.data.model.PrefixGameFinishResult
 import sport.quiz.skeleton.data.model.PrefixQuestion
 import sport.quiz.skeleton.data.repository.PrefixHighScoreRepository
+import sport.quiz.skeleton.di.DispatcherProvider
 import sport.quiz.skeleton.data.repository.PrefixTopicRepository
 import sport.quiz.skeleton.ui.composable.navigation.NavRoute
 import java.time.LocalDateTime
@@ -22,6 +23,7 @@ class PrefixGameViewModel(
     savedStateHandle: SavedStateHandle,
     private val topicRepository: PrefixTopicRepository,
     private val highScoreRepository: PrefixHighScoreRepository,
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val args = savedStateHandle.toRoute<NavRoute.Game>()
 
@@ -71,7 +73,7 @@ class PrefixGameViewModel(
             _currentQuestion.value = allQuestions[0]
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.main) {
             delay(2000)
             _isLoading.value = false
             startTimer()
@@ -81,7 +83,7 @@ class PrefixGameViewModel(
     private fun startTimer() {
         timerJob?.cancel()
         _remainingTimeMs.value = TOTAL_DURATION_MS
-        timerJob = viewModelScope.launch {
+        timerJob = viewModelScope.launch(dispatchers.main) {
             val tickIntervalMs = 100L
             var elapsedMs = 0L
 
@@ -94,7 +96,7 @@ class PrefixGameViewModel(
             if (!_isAnswered.value) {
                 _isAnswered.value = true
                 transitionJob?.cancel()
-                transitionJob = viewModelScope.launch {
+                transitionJob = viewModelScope.launch(dispatchers.main) {
                     delay(NEXT_ROUND_DELAY)
                     nextQuestion()
                 }
@@ -122,7 +124,7 @@ class PrefixGameViewModel(
         }
 
         transitionJob?.cancel()
-        transitionJob = viewModelScope.launch {
+        transitionJob = viewModelScope.launch(dispatchers.main) {
             delay(NEXT_ROUND_DELAY)
             nextQuestion()
         }
@@ -164,7 +166,7 @@ class PrefixGameViewModel(
     }
 
     private fun saveHighScore(questionsCount: Int, correctAnswers: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.main) {
             val highScore = PrefixHighScore(
                 questions = questionsCount,
                 rightAnswers = correctAnswers,

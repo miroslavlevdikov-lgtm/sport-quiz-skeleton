@@ -12,9 +12,11 @@ import kotlinx.coroutines.launch
 import sport.quiz.skeleton.data.entity.PrefixHighScore
 import sport.quiz.skeleton.data.model.HighScoreSortType
 import sport.quiz.skeleton.data.repository.PrefixHighScoreRepository
+import sport.quiz.skeleton.di.DispatcherProvider
 
 class PrefixHighScoreViewModel(
-    private val highScoreRepository: PrefixHighScoreRepository
+    private val highScoreRepository: PrefixHighScoreRepository,
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val _highScoresState = MutableStateFlow<List<PrefixHighScore>>(emptyList())
@@ -43,7 +45,7 @@ class PrefixHighScoreViewModel(
     }
 
     fun loadHighScores() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.main) {
             _isLoadingState.value = true
             _highScoresState.value = highScoreRepository.getAll()
             _isLoadingState.value = false
@@ -55,7 +57,7 @@ class PrefixHighScoreViewModel(
     }
 
     fun deleteHighScores() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatchers.main) {
             highScoreRepository.deleteAll()
             _highScoresState.value = emptyList()
         }
